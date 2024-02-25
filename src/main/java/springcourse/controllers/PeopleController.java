@@ -10,7 +10,6 @@ import springcourse.models.Person;
 import springcourse.util.PersonValidator;
 
 import javax.validation.Valid;
-import java.sql.SQLException;
 
 @Controller
 @RequestMapping("/people")
@@ -20,13 +19,13 @@ public class PeopleController {
     private final PersonValidator personValidator;
 
     @Autowired
-    public PeopleController(PersonDAO personDAO, PersonValidator personValidator) {
+    public PeopleController(PersonDAO personDAO, PersonValidator personValidator)     {
         this.personDAO = personDAO;
         this.personValidator = personValidator;
     }
 
     @GetMapping()
-    public String index(Model model) throws SQLException {
+    public String index(Model model) {
         model.addAttribute("people", personDAO.index());
         return "people/index";
     }
@@ -34,11 +33,13 @@ public class PeopleController {
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
         model.addAttribute("person", personDAO.show(id));
+        model.addAttribute("books", personDAO.getBooksByPersonId(id));
         return "people/show";
     }
 
     @GetMapping("/new")
-    public String newPerson(@ModelAttribute("person") Person person) {
+    public String newPerson(Model model) {
+        model.addAttribute("person", new Person());
         return "people/new";
     }
 
@@ -48,11 +49,12 @@ public class PeopleController {
 
         personValidator.validate(person, bindingResult);
 
-        if (bindingResult.hasErrors())
+        if(bindingResult.hasErrors())
             return "people/new";
 
         personDAO.save(person);
-        return "redirect:/people";
+
+         return "redirect:/people";
     }
 
     @GetMapping("/{id}/edit")
@@ -65,12 +67,11 @@ public class PeopleController {
     public String update(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult,
                          @PathVariable("id") int id) {
 
-        personValidator.validate(person, bindingResult);
 
         if (bindingResult.hasErrors())
             return "people/edit";
 
-        personDAO.update(id, person);
+        personDAO.update(id, person)    ;
         return "redirect:/people";
     }
 

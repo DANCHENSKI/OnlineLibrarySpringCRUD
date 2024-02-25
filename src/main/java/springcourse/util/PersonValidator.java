@@ -9,6 +9,7 @@ import springcourse.models.Person;
 
 @Component
 public class PersonValidator implements Validator {
+
     private final PersonDAO personDAO;
 
     @Autowired
@@ -17,15 +18,15 @@ public class PersonValidator implements Validator {
     }
 
     @Override
-    public boolean supports(Class<?> clazz) {
-        return Person.class.equals(clazz);
+    public boolean supports(Class<?> aClass) {
+        return Person.class.equals(aClass);
     }
 
     @Override
-    public void validate(Object target, Errors errors) {
-        Person person = (Person) target;
+    public void validate(Object o, Errors errors) {
+        Person person = (Person) o;
 
-        if (personDAO.show(person.getEmail()).isPresent())
-            errors.rejectValue("email", "", "This email is already taken");
+        if (personDAO.getPersonByFullName(person.getFullName()).isPresent())
+            errors.rejectValue("fullName", "", "Человек с таким ФИО уже существует");
     }
 }
